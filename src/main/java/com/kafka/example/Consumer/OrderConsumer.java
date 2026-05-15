@@ -31,6 +31,7 @@ public class OrderConsumer {
                 System.out.println(
                         "Received : " + order
                 );
+
             }
         }
     }
