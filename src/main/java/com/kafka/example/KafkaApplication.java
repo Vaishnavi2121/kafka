@@ -1,34 +1,16 @@
 package com.kafka.example;
 
-import com.kafka.example.Consumer.OrderConsumer;
-import com.kafka.example.Producer.OrderProducer;
-import com.kafka.example.config.KafkaConfig;
-import com.kafka.example.model.Order;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication
 public class KafkaApplication {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
-        System.out.println("Kafka Application Started");
-
-        OrderProducer producer =
-                new OrderProducer(
-                        KafkaConfig.createProducer()
-                );
-
-        producer.sendOrder(
-                new Order(
-                        101,
-                        "iPhone",
-                        80000
-                )
+        SpringApplication.run(
+                KafkaApplication.class,
+                args
         );
-
-        OrderConsumer consumer =
-                new OrderConsumer(
-                        KafkaConfig.createConsumer()
-                );
-
-        consumer.consumeOrders();
     }
 }

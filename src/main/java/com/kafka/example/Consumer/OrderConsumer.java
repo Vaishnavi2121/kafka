@@ -2,37 +2,42 @@ package com.kafka.example.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kafka.example.model.Order;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-
+@Service
+@RequiredArgsConstructor
 public class OrderConsumer {
 
-    private final KafkaConsumer<String,String> consumer;
+    private final KafkaTemplate<String,String> kafkaTemplate;
 
     private final ObjectMapper mapper =
             new ObjectMapper();
 
 
-    public OrderConsumer(KafkaConsumer<String,String> consumer) {
-      this.consumer = consumer;
-    }
+   @KafkaListener(
+           topics = "orders-topic",
+           groupId = "order-group"
+   )
 
-    public void consumeOrders() throws Exception{
-        while (true){
-            ConsumerRecords<String,String> records =
-                    consumer.poll(Duration.ofMillis(1000));
+    public void consume(String message) throws Exception {
 
-            for(ConsumerRecord<String ,String> record: records){
-                Order order = mapper.readValue(record.value(),Order.class);
+        Order order = mapper.readValue(message,Order.class);
 
-                System.out.println(
-                        "Received : " + order
-                );
+        System.out.println("Recieved:" +order);
 
-            }
-        }
+        //Processed Orders
+
+       String processedMessage =
+               "PROCESSED --> " + message;
+
+       kafkaTemplate.send(
+               "processed-orders-topic",
+               processedMessage
+       );
+
+       System.out.println("Message Sent to processed order topic");
     }
 }
