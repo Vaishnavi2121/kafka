@@ -1,6 +1,7 @@
 package com.kafka.example.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kafka.example.dto.OrderRepository;
 import com.kafka.example.model.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 public class OrderConsumer {
 
     private final KafkaTemplate<String,String> kafkaTemplate;
+
+    private final OrderRepository orderRepository;
 
     private final ObjectMapper mapper =
             new ObjectMapper();
@@ -25,6 +28,9 @@ public class OrderConsumer {
     public void consume(String message) throws Exception {
 
         Order order = mapper.readValue(message,Order.class);
+
+        //save to database
+        orderRepository.save(order);
 
         System.out.println("Recieved:" +order);
 
